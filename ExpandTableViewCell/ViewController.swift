@@ -8,13 +8,76 @@
 
 import UIKit
 
-class ViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-    }
-
-
+struct item {
+    var isExpand:Bool = false
+    var txt:[String] = ["null"]
 }
 
+class ViewController: UIViewController {
+
+    @IBOutlet weak var tableViewList: UITableView!
+    var itemList:[item]!
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+       
+        itemList = [item(isExpand: false, txt: ["a","b","c"]),
+                    item(isExpand: false, txt: ["b","c"]),
+                    item(isExpand: false, txt: ["c","d","e","f"])]
+        
+        
+        tableViewList.register(UINib(nibName: "SectionHeader", bundle: nil), forHeaderFooterViewReuseIdentifier: "sectionHeader")
+    }
+}
+
+extension ViewController: UITableViewDataSource, UITableViewDelegate {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return itemList.count
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return itemList[section].txt.count
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 44
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if itemList[indexPath.section].isExpand == true {
+            return 44
+        } else {
+            return 0
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = tableViewList.dequeueReusableHeaderFooterView(withIdentifier: "sectionHeader") as! SectionHeader
+        
+        headerView.customInit(month: "FEB", section: section, delegate: self)
+        return headerView
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = self.tableViewList.dequeueReusableCell(withIdentifier: "cellSubExpand", for: indexPath)
+        
+        cell.textLabel?.text = itemList[indexPath.section].txt[indexPath.row]
+        return cell
+    }
+}
+
+extension ViewController: SectionHeaderViewDelegate {
+    func toggleSection(header: SectionHeader, section: Int) {
+        
+        itemList[section].isExpand = !itemList[section].isExpand
+        
+        tableViewList.beginUpdates()
+        for i in 0 ... itemList[section].txt.count - 1 {
+            //            sections[section].studentSubdetailStatus.count {
+            tableViewList.reloadRows(at: [IndexPath(row: i, section: section)], with: .automatic)
+        }
+        tableViewList.endUpdates()
+    }
+}
