@@ -56,7 +56,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = tableViewList.dequeueReusableHeaderFooterView(withIdentifier: "sectionHeader") as! SectionHeader
         
-        headerView.customInit(month: "FEB", section: section, delegate: self)
+        headerView.customInit(month: "Open", section: section, delegate: self)
         return headerView
     }
     
@@ -73,9 +73,14 @@ extension ViewController: SectionHeaderViewDelegate {
         
         itemList[section].isExpand = !itemList[section].isExpand
         
+        if itemList[section].isExpand {
+            header.customInit(month: "Close", section: section, delegate: self)
+        } else {
+            header.customInit(month: "Open", section: section, delegate: self)
+        }
+        
         tableViewList.beginUpdates()
         for i in 0 ... itemList[section].txt.count - 1 {
-            //            sections[section].studentSubdetailStatus.count {
             tableViewList.reloadRows(at: [IndexPath(row: i, section: section)], with: .automatic)
         }
         tableViewList.endUpdates()
